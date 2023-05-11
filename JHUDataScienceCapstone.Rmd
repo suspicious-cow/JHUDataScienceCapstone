@@ -1,0 +1,45 @@
+---
+title: "Johns Hopkins University Data Science Capstone"
+author: "Zain Naboulsi"
+date: "2023-03-22"
+output:
+  pdf_document:
+    
+    toc: yes
+  html_document:
+    
+    toc: yes
+editor_options: 
+  markdown: 
+    wrap: 80
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, echo = FALSE, warning = FALSE, error = FALSE, message = FALSE, appendix = TRUE}
+# set a seed in case we use any random values
+set.seed(1337)
+
+# Set the names of the packages and libraries you want to install
+required_libraries <- c("ggplot2")
+
+
+# Install missing packages and load all required libraries
+options(repos = c(CRAN = "https://cran.r-project.org"))
+
+for (lib in required_libraries) {
+  if (!requireNamespace(lib, quietly = TRUE)) {
+    install.packages(lib)
+  }
+  library(lib, character.only = TRUE)
+}
+
+```
+
+
+\newpage
+# Appendix: All Source Code
+
+```{r ref.label = knitr::all_labels(appendix == TRUE), echo=TRUE, eval=FALSE}
+```
