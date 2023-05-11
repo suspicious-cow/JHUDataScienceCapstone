@@ -2,6 +2,7 @@
 title: "Johns Hopkins University Data Science Capstone"
 author: "Zain Naboulsi"
 date: "2023-03-22"
+bibliography: references.bib
 output:
   pdf_document:
     
@@ -12,22 +13,28 @@ output:
 editor_options: 
   markdown: 
     wrap: 80
+    
 ---
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+Testing references @R-base to see if they work. How about parens [@R-base] or
+even minus the author -@R-base is cool. 
+
+You have to use the reference @quanteda in order for it to show up. 
+
 ```{r, echo = FALSE, warning = FALSE, error = FALSE, message = FALSE, appendix = TRUE}
-# set a seed in case we use any random values
+# set a seed in case we use any random items
 set.seed(1337)
 
-# Set the names of the packages and libraries you want to install
-required_libraries <- c("ggplot2")
 
+# Set the names of the packages and libraries you want to install
+# Most notably load up all the quanteda packages we will need
+required_libraries <- c("quanteda","quanteda.textmodels","quanteda.textstats",
+                        "quanteda.textplots")
 
 # Install missing packages and load all required libraries
-options(repos = c(CRAN = "https://cran.r-project.org"))
-
 for (lib in required_libraries) {
   if (!requireNamespace(lib, quietly = TRUE)) {
     install.packages(lib)
@@ -39,7 +46,12 @@ for (lib in required_libraries) {
 
 
 \newpage
-# Appendix: All Source Code
+# References  
+
+<div id="refs"></div>  
+
+
+# Appendix: All Source Code  
 
 ```{r ref.label = knitr::all_labels(appendix == TRUE), echo=TRUE, eval=FALSE}
 ```
