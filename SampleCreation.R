@@ -1,99 +1,110 @@
+
+
+# Define the function for sampling lines
 sample_lines2 <- function(file, n) {
   total_lines <- sum(readLines(file) != "")
-  
-  # Determine the probability of selection for each line
   p <- n / total_lines
-  
-  # Initialize an empty vector to store the selected lines
   lines_sample <- c()
-  
-  # Read the file line by line
   con <- file(file, "r")
   while(TRUE) {
     line <- readLines(con, n = 1)
     if(length(line) == 0) {
       break
     }
-    
-    # Add the line to the sample with probability p
     if(runif(1) < p) {
       lines_sample <- c(lines_sample, line)
     }
   }
   close(con)
-  
   return(lines_sample)
 }
 
-sample_size <- 10000
+# Check if the digest files exist
+if (!file.exists("Digests/blogs_sample_digest.txt") | 
+    !file.exists("Digests/news_sample_digest.txt") | 
+    !file.exists("Digests/twitter_sample_digest.txt")) {
+  
+  blogs_sample_digest <- digest(file.info("SampleData/blogs_sample.txt")$mtime)
+  write.table(blogs_sample_digest, file = "Digests/blogs_sample_digest.txt", 
+              row.names = FALSE, col.names = FALSE, quote = FALSE, append = FALSE)
+  
+  news_sample_digest <- digest(file.info("SampleData/news_sample.txt")$mtime)
+  write.table(news_sample_digest, file = "Digests/news_sample_digest.txt", 
+              row.names = FALSE, col.names = FALSE, quote = FALSE, append = FALSE)
+  
+  twitter_sample_digest <- digest(file.info("SampleData/twitter_sample.txt")$mtime)
+  write.table(twitter_sample_digest, file = "Digests/twitter_sample_digest.txt", 
+              row.names = FALSE, col.names = FALSE, quote = FALSE, append = FALSE)
+  
+} else {
+  blogs_sample_digest <- readLines("Digests/blogs_sample_digest.txt")
+  news_sample_digest <- readLines("Digests/news_sample_digest.txt")
+  twitter_sample_digest <- readLines("Digests/twitter_sample_digest.txt")
+}
 
-# Check if the file exists before sampling
-if (!file.exists("SampleData/blogs_sample.txt")) {
+# Check if the sample files have changed
+if (digest(file.info("SampleData/blogs_sample.txt")$mtime) != blogs_sample_digest |
+    digest(file.info("SampleData/news_sample.txt")$mtime) != news_sample_digest |
+    digest(file.info("SampleData/twitter_sample.txt")$mtime) != twitter_sample_digest) {
+  
+  sample_size <- 10000
   blogs_sample <- sample_lines2("SwiftKeyData/en_US.blogs.txt", sample_size)
-  write.table(blogs_sample, file = "SampleData/blogs_sample.txt", row.names = FALSE, col.names = FALSE, quote = FALSE, append = FALSE)
+  news_sample <- sample_lines2("SwiftKeyData/en_US.news.txt", sample_size)
+  twitter_sample <- sample_lines2("SwiftKeyData/en_US.twitter.txt", sample_size)
+  
+  write.table(blogs_sample, file = "SampleData/blogs_sample.txt", 
+              row.names = FALSE, col.names = FALSE, quote = FALSE, append = FALSE)
+  write.table(news_sample, file = "SampleData/news_sample.txt", 
+              row.names = FALSE, col.names = FALSE, quote = FALSE, append = FALSE)
+  write.table(twitter_sample, file = "SampleData/twitter_sample.txt", 
+              row.names = FALSE, col.names = FALSE, quote = FALSE, append = FALSE)
+  
 } else {
   blogs_sample <- readLines("SampleData/blogs_sample.txt")
-}
-
-if (!file.exists("SampleData/news_sample.txt")) {
-  news_sample <- sample_lines2("SwiftKeyData/en_US.news.txt", sample_size)
-  write.table(news_sample, file = "SampleData/news_sample.txt", row.names = FALSE, col.names = FALSE, quote = FALSE, append = FALSE)
-} else {
   news_sample <- readLines("SampleData/news_sample.txt")
-}
-
-if (!file.exists("SampleData/twitter_sample.txt")) {
-  twitter_sample <- sample_lines2("SwiftKeyData/en_US.twitter.txt", sample_size)
-  write.table(twitter_sample, file = "SampleData/twitter_sample.txt", row.names = FALSE, col.names = FALSE, quote = FALSE, append = FALSE)
-} else {
   twitter_sample <- readLines("SampleData/twitter_sample.txt")
 }
 
 full_data_sample <- c(blogs_sample, news_sample, twitter_sample)
 
-if (!file.exists("SampleData/full_data_sample.txt")) {
-  write.table(full_data_sample, file = "SampleData/full_data_sample.txt", row.names = FALSE, col.names = FALSE, quote = FALSE, append = FALSE)
+# Check if the RDS files exist
+if (file.exists("Objects/corp.rds") &
+    file.exists("Objects/tokens.rds") &
+    file.exists("Objects/ngram2.rds") &
+    file.exists("Objects/ngram3.rds") &
+    file.exists("Objects/ngram4.rds")) {
+  
+  # Load the RDS files
+  corp <- readRDS("Objects/corp.rds")
+  tokens <- readRDS("Objects/tokens.rds")
+  ngram2 <- readRDS("Objects/ngram2.rds")
+  ngram3 <- readRDS("Objects/ngram3.rds")
+  ngram4 <- readRDS("Objects/ngram4.rds")
+  
 } else {
-  full_data_sample <- readLines("SampleData/full_data_sample.txt")
-}
-
-
-# Check if the digest file exists
-if (!file.exists("Objects/full_data_sample_digest.txt")) {
-  sample_digest <- digest(full_data_sample)
-  write.table(sample_digest, file = "Objects/full_data_sample_digest.txt", row.names = FALSE, col.names = FALSE, quote = FALSE, append = FALSE)
-} else {
-  sample_digest <- readLines("Objects/full_data_sample_digest.txt")
-}
-
-# Check if the objects exist and the digest matches
-if (file.exists("Objects/corp.RDS") & file.exists("Objects/tokens.RDS") & file.exists("Objects/ngram2.RDS") & file.exists("Objects/ngram3.RDS") & file.exists("Objects/ngram4.RDS") & (digest(full_data_sample) == sample_digest)) {
-  corp <- readRDS("Objects/corp.RDS")
-  tokens <- readRDS("Objects/tokens.RDS")
-  ngram2 <- readRDS("Objects/ngram2.RDS")
-  ngram3 <- readRDS("Objects/ngram3.RDS")
-  ngram4 <- readRDS("Objects/ngram4.RDS")
-} else {
-  # Convert the text to a corpus
+  
+  # Create the corpus, tokens, and ngrams
   corp <- corpus(full_data_sample)
-  saveRDS(corp, "Objects/corp.RDS")
-  
-  # Convert the corpus to tokens
   tokens <- tokens(corp)
-  saveRDS(tokens, "Objects/tokens.RDS")
-  
-  # Create n-grams
   ngram2 <- tokens_ngrams(tokens, n = 2)
-  saveRDS(ngram2, "Objects/ngram2.RDS")
-  
   ngram3 <- tokens_ngrams(tokens, n = 3)
-  saveRDS(ngram3, "Objects/ngram3.RDS")
-  
   ngram4 <- tokens_ngrams(tokens, n = 4)
-  saveRDS(ngram4, "Objects/ngram4.RDS")
   
-  # Update the digest
-  sample_digest <- digest(full_data_sample)
-  write.table(sample_digest, file = "Objects/full_data_sample_digest.txt", row.names = FALSE, col.names = FALSE, quote = FALSE, append = FALSE)
+  # Save the corpus, tokens, and ngrams to RDS files
+  saveRDS(corp, "Objects/corp.rds")
+  saveRDS(tokens, "Objects/tokens.rds")
+  saveRDS(ngram2, "Objects/ngram2.rds")
+  saveRDS(ngram3, "Objects/ngram3.rds")
+  saveRDS(ngram4, "Objects/ngram4.rds")
 }
 
+# Update the digest files with the new modification times
+blogs_sample_digest <- digest(file.info("SampleData/blogs_sample.txt")$mtime)
+news_sample_digest <- digest(file.info("SampleData/news_sample.txt")$mtime)
+twitter_sample_digest <- digest(file.info("SampleData/twitter_sample.txt")$mtime)
+full_data_sample_digest <- digest(file.info("SampleData/full_data_sample.txt")$mtime)
+
+writeLines(blogs_sample_digest, con = "SampleData/blogs_sample_digest.txt")
+writeLines(news_sample_digest, con = "SampleData/news_sample_digest.txt")
+writeLines(twitter_sample_digest, con = "SampleData/twitter_sample_digest.txt")
+writeLines(full_data_sample_digest, con = "SampleData/full_data_sample_digest.txt")
