@@ -1,8 +1,15 @@
+
+
 sample_lines <- function(file, n) {
   total_lines <- sum(readLines(file) != "")
-  skip <- sort(sample.int(total_lines, total_lines - n))
-  read.table(file, skip = skip, header = FALSE, stringsAsFactors = FALSE)
+  line_numbers <- data.frame(line_number = 1:total_lines)
+  sample_line_numbers <- sqldf(paste0("SELECT * FROM line_numbers 
+                                        ORDER BY RANDOM() 
+                                        LIMIT ", n))
+  read.table(file, skip = setdiff(1:total_lines, sample_line_numbers$line_number),
+             header = FALSE, stringsAsFactors = FALSE)
 }
+
 
 sample_size <- 10000
 blogs_sample <- sample_lines("SwiftKeyData/en_US.blogs.txt", sample_size)
