@@ -32,31 +32,30 @@ if (!file.exists("SampleData/blogs_sample.txt")) {
   blogs_sample <- sample_lines2("SwiftKeyData/en_US.blogs.txt", sample_size)
   write.table(blogs_sample, file = "SampleData/blogs_sample.txt", row.names = FALSE, col.names = FALSE, quote = FALSE, append = FALSE)
 } else {
-  blogs_sample <- read.table("SampleData/blogs_sample.txt", header = FALSE, stringsAsFactors = FALSE)
+  blogs_sample <- readLines("SampleData/blogs_sample.txt")
 }
 
 if (!file.exists("SampleData/news_sample.txt")) {
   news_sample <- sample_lines2("SwiftKeyData/en_US.news.txt", sample_size)
   write.table(news_sample, file = "SampleData/news_sample.txt", row.names = FALSE, col.names = FALSE, quote = FALSE, append = FALSE)
 } else {
-  news_sample <- read.table("SampleData/news_sample.txt", header = FALSE, stringsAsFactors = FALSE)
+  news_sample <- readLines("SampleData/news_sample.txt")
 }
 
 if (!file.exists("SampleData/twitter_sample.txt")) {
   twitter_sample <- sample_lines2("SwiftKeyData/en_US.twitter.txt", sample_size)
   write.table(twitter_sample, file = "SampleData/twitter_sample.txt", row.names = FALSE, col.names = FALSE, quote = FALSE, append = FALSE)
 } else {
-  twitter_sample <- read.table("SampleData/twitter_sample.txt", header = FALSE, stringsAsFactors = FALSE)
+  twitter_sample <- readLines("SampleData/twitter_sample.txt")
 }
 
+full_data_sample <- c(blogs_sample, news_sample, twitter_sample)
 
 if (!file.exists("SampleData/full_data_sample.txt")) {
-  full_data_sample <- c(blogs_sample, news_sample, twitter_sample)
   write.table(full_data_sample, file = "SampleData/full_data_sample.txt", row.names = FALSE, col.names = FALSE, quote = FALSE, append = FALSE)
 } else {
-  full_data_sample <- read.table("SampleData/full_data_sample.txt", header = FALSE, stringsAsFactors = FALSE)[,1]
+  full_data_sample <- readLines("SampleData/full_data_sample.txt")
 }
-
 
 
 
