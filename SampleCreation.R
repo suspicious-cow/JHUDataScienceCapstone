@@ -39,9 +39,11 @@ write.table(full_data_sample, file = "SampleData/full_data_sample.txt", row.name
 
 
 
+# Convert the text to a corpus
+corp <- corpus(full_data_sample$V1)
 
-# Create a TextDocument object
-tdm <- TextDocument(full_data_sample$V1)
+# Convert the corpus to tokens
+tokens <- tokens(corp)
 
 # Create n-grams
-ngram <- ngram(tdm, n = 3) # Change n as per your requirement
+ngram <- tokens_ngrams(tokens, n = 3) # Change n as per your requirement
