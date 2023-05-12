@@ -58,10 +58,6 @@ if (!file.exists("SampleData/full_data_sample.txt")) {
 }
 
 
-# Load the required package
-library(quanteda)
-library(digest)
-
 # Check if the digest file exists
 if (!file.exists("Objects/full_data_sample_digest.txt")) {
   sample_digest <- digest(full_data_sample)
