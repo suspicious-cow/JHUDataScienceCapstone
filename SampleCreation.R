@@ -72,7 +72,8 @@ if (file.exists("Objects/corp.rds") &
     file.exists("Objects/tokens.rds") &
     file.exists("Objects/ngram2.rds") &
     file.exists("Objects/ngram3.rds") &
-    file.exists("Objects/ngram4.rds")) {
+    file.exists("Objects/ngram4.rds") & 
+    file.exists("Objects/tokens_dfm.rds")) {
   
   # Load the RDS files
   corp <- readRDS("Objects/corp.rds")
@@ -80,6 +81,7 @@ if (file.exists("Objects/corp.rds") &
   ngram2 <- readRDS("Objects/ngram2.rds")
   ngram3 <- readRDS("Objects/ngram3.rds")
   ngram4 <- readRDS("Objects/ngram4.rds")
+  tokens_dfm <- readRDS("Objects/tokens_dfm.rds")
   
 } else {
   
@@ -89,6 +91,7 @@ if (file.exists("Objects/corp.rds") &
   ngram2 <- tokens_ngrams(tokens, n = 2)
   ngram3 <- tokens_ngrams(tokens, n = 3)
   ngram4 <- tokens_ngrams(tokens, n = 4)
+  tokens_dfm <- dfm(tokens)
   
   # Save the corpus, tokens, and ngrams to RDS files
   saveRDS(corp, "Objects/corp.rds")
@@ -96,6 +99,7 @@ if (file.exists("Objects/corp.rds") &
   saveRDS(ngram2, "Objects/ngram2.rds")
   saveRDS(ngram3, "Objects/ngram3.rds")
   saveRDS(ngram4, "Objects/ngram4.rds")
+  saveRDS(tokens_dfm, "Objects/tokens_dfm.rds")
 }
 
 # Update the digest files with the new modification times
