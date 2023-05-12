@@ -58,12 +58,46 @@ if (!file.exists("SampleData/full_data_sample.txt")) {
 }
 
 
+# Load the required package
+library(quanteda)
+library(digest)
 
-# Convert the text to a corpus
-corp <- corpus(full_data_sample)
+# Check if the digest file exists
+if (!file.exists("Objects/full_data_sample_digest.txt")) {
+  sample_digest <- digest(full_data_sample)
+  write.table(sample_digest, file = "Objects/full_data_sample_digest.txt", row.names = FALSE, col.names = FALSE, quote = FALSE, append = FALSE)
+} else {
+  sample_digest <- readLines("Objects/full_data_sample_digest.txt")
+}
 
-# Convert the corpus to tokens
-tokens <- tokens(corp)
+# Check if the objects exist and the digest matches
+if (file.exists("Objects/corp.RDS") & file.exists("Objects/tokens.RDS") & file.exists("Objects/ngram2.RDS") & file.exists("Objects/ngram3.RDS") & file.exists("Objects/ngram4.RDS") & (digest(full_data_sample) == sample_digest)) {
+  corp <- readRDS("Objects/corp.RDS")
+  tokens <- readRDS("Objects/tokens.RDS")
+  ngram2 <- readRDS("Objects/ngram2.RDS")
+  ngram3 <- readRDS("Objects/ngram3.RDS")
+  ngram4 <- readRDS("Objects/ngram4.RDS")
+} else {
+  # Convert the text to a corpus
+  corp <- corpus(full_data_sample)
+  saveRDS(corp, "Objects/corp.RDS")
+  
+  # Convert the corpus to tokens
+  tokens <- tokens(corp)
+  saveRDS(tokens, "Objects/tokens.RDS")
+  
+  # Create n-grams
+  ngram2 <- tokens_ngrams(tokens, n = 2)
+  saveRDS(ngram2, "Objects/ngram2.RDS")
+  
+  ngram3 <- tokens_ngrams(tokens, n = 3)
+  saveRDS(ngram3, "Objects/ngram3.RDS")
+  
+  ngram4 <- tokens_ngrams(tokens, n = 4)
+  saveRDS(ngram4, "Objects/ngram4.RDS")
+  
+  # Update the digest
+  sample_digest <- digest(full_data_sample)
+  write.table(sample_digest, file = "Objects/full_data_sample_digest.txt", row.names = FALSE, col.names = FALSE, quote = FALSE, append = FALSE)
+}
 
-# Create n-grams
-ngram <- tokens_ngrams(tokens, n = 3) # Change n as per your requirement
