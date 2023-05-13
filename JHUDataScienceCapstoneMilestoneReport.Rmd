@@ -1,5 +1,5 @@
 ---
-title: "Johns Hopkins University Data Science Capstone"
+title: "Johns Hopkins University Data Science Capstone - Milestone Report"
 author: "Zain Naboulsi"
 date: "2023-05-12"
 bibliography: references.bib
