@@ -74,4 +74,37 @@ textplot_wordcloud(tokens_dfm)
 # Reset the base font size to the default
 par(cex = 1)
 
-# ========================= WORD RELATIONSHIPS =================================
+# ========================= WORD RELATIONSHIPS ===============================
+# Compute the feature co-occurrence matrix
+fcm_matrix <- fcm(tokens)
+
+# Print the feature co-occurrence matrix
+print(fcm_matrix)
+
+# Assuming you already have a tokenized text in 'tokens'
+collocations2 <- textstat_collocations(tokens, size = 2)  # for bigrams
+collocations3 <- textstat_collocations(tokens, size = 3)  # for trigrams
+
+# print the top 10 collocations
+head(collocations2, 10)
+head(collocations3, 10)
+
+# Assuming you already have a tokenized text in 'tokens'
+collocations2_nostop <- textstat_collocations(tokens_nostop, size = 2)  # for bigrams
+collocations3_nostop <- textstat_collocations(tokens_nostop, size = 3)  # for trigrams
+
+# print the top 10 collocations
+head(collocations2_nostop, 10)
+head(collocations3_nostop, 10)
+
+
+
+
+
+
+
+
+
+
+
+
