@@ -5,7 +5,8 @@ set.seed(1337)
 # Set the names of the packages and libraries you want to install
 # Most notably load up all the quanteda packages we will need
 required_libraries <- c("quanteda","quanteda.textmodels","quanteda.textstats",
-                        "quanteda.textplots", "readtext", "text", "sqldf", "digest")
+                        "quanteda.textplots", "readtext", "text", "sqldf", 
+                        "digest", "ggplot2")
 
 # Install missing packages and load all required libraries
 for (lib in required_libraries) {
