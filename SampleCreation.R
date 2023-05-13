@@ -1,3 +1,8 @@
+##
+# Created by Zain Naboulsi for the Johns Hopkins Data Science Specialization Capstone Course 
+##
+
+
 # set a seed in case we use any random items
 set.seed(1337)
 
