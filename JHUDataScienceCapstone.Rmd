@@ -4,16 +4,16 @@ author: "Zain Naboulsi"
 date: "2023-03-22"
 bibliography: references.bib
 output:
-  pdf_document:
+  html_document:
     
     toc: yes
-  html_document:
+  pdf_document:
     
     toc: yes
 editor_options: 
   markdown: 
-    wrap: 80
     
+    wrap: 80
 ---
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
