@@ -137,6 +137,5 @@ writeLines(twitter_sample_digest, con = "SampleData/twitter_sample_digest.txt")
 writeLines(full_data_sample_digest, con = "SampleData/full_data_sample_digest.txt")
 
 
-top_tokens <- topfeatures(tokens_dfm, n = 20) # change n to get more or less tokens
 
-print(top_tokens)
+
