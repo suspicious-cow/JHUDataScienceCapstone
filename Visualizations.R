@@ -1,3 +1,7 @@
+# ========================= FULL SOURCE =================================
+# Print the results
+print(initialfilemetrics)
+
 
 # ========================= BASIC ANALYSIS =================================
 # frequency of words
@@ -120,19 +124,14 @@ fcm_matrix <- fcm(tokens)
 # Print the feature co-occurrence matrix
 print(fcm_matrix)
 
-# Assuming you already have a tokenized text in 'tokens'
-collocations2 <- textstat_collocations(tokens, size = 2)  # for bigrams
-collocations3 <- textstat_collocations(tokens, size = 3)  # for trigrams
 
-# print the top 10 collocations
+
+# print the top 10 collocations bigram and trigram objects for sample with stopwords
 head(collocations2, 10)
 head(collocations3, 10)
 
-# Assuming you already have a tokenized text in 'tokens'
-collocations2_nostop <- textstat_collocations(tokens_nostop, size = 2)  # for bigrams
-collocations3_nostop <- textstat_collocations(tokens_nostop, size = 3)  # for trigrams
 
-# print the top 10 collocations
+# print the top 10 collocations bigram and trigram objects for sample without stopwords
 head(collocations2_nostop, 10)
 head(collocations3_nostop, 10)
 

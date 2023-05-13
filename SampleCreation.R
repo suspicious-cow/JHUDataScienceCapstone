@@ -20,6 +20,64 @@ for (lib in required_libraries) {
   library(lib, character.only = TRUE)
 }
 
+
+# Get our initial file metrics on the very large source files
+if (file.exists("Objects/initialfilemetrics.rds")) {
+  
+  # read our object
+  initialfilemetrics <- readRDS("Objects/initialfilemetrics.rds")
+  
+} else {
+  # Define your file paths
+  file_paths <- c("SwiftKeyData/en_US.blogs.txt", "SwiftKeyData/en_US.news.txt", "SwiftKeyData/en_US.twitter.txt")
+  
+  # Initialize a data frame to store the results
+  results <- data.frame(
+    File = character(),
+    Line_Count = numeric(),
+    Word_Count = numeric(),
+    stringsAsFactors = FALSE
+  )
+  
+  # Process each file
+  for (file_path in file_paths) {
+    # Initialize counters
+    line_count <- 0
+    word_count <- 0
+    
+    # Open a connection to the file
+    con <- file(file_path, "r")
+    
+    # Read the file line by line
+    while (TRUE) {
+      lines <- readLines(con, n = 1)  # read one line at a time
+      
+      if (length(lines) == 0) {  # end of file
+        break
+      }
+      
+      # Update line and word counts
+      line_count <- line_count + 1
+      word_count <- word_count + length(strsplit(lines, "\\s")[[1]])
+    }
+    
+    # Close the connection
+    close(con)
+    
+    # Add the results to the data frame
+    initialfilemetrics <- rbind(results, data.frame(
+      File = file_path,
+      Line_Count = line_count,
+      Word_Count = word_count,
+      stringsAsFactors = FALSE
+    ))
+  }
+  
+  # save our object
+  saveRDS(initialfilemetrics, "Objects/initialfilemetrics.rds")
+}
+
+
 # Define the function for sampling lines
 sample_lines2 <- function(file, n) {
   total_lines <- sum(readLines(file) != "")
@@ -93,7 +151,13 @@ if (file.exists("Objects/corp.rds") &
     file.exists("Objects/ngram2.rds") &
     file.exists("Objects/ngram3.rds") &
     file.exists("Objects/ngram4.rds") & 
-    file.exists("Objects/tokens_dfm.rds")) {
+    file.exists("Objects/tokens_dfm.rds") &
+    file.exists("Objects/collocations2.rds") &
+    file.exists("Objects/collocations3.rds") &
+    file.exists("Objects/collocations2_nostop.rds") &
+    file.exists("Objects/collocations3_nostop.rds")
+    
+    ) {
   
   # Load the RDS files
   corp <- readRDS("Objects/corp.rds")
@@ -102,6 +166,10 @@ if (file.exists("Objects/corp.rds") &
   ngram3 <- readRDS("Objects/ngram3.rds")
   ngram4 <- readRDS("Objects/ngram4.rds")
   tokens_dfm <- readRDS("Objects/tokens_dfm.rds")
+  collocations2 <- readRDS("Objects/collocations2.rds")
+  collocations3 <- readRDS("Objects/collocations3.rds")
+  collocations2_nostop <- readRDS("Objects/collocations2_nostop.rds")
+  collocations3_nostop <- readRDS("Objects/collocations3_nostop.rds")
   
 } else {
   
@@ -116,6 +184,14 @@ if (file.exists("Objects/corp.rds") &
   ngram4 <- tokens_ngrams(tokens, n = 4)
   tokens_dfm <- dfm(tokens)
   
+  # create our bigram and trigram objects for sample with stopwords
+  collocations2 <- textstat_collocations(tokens, size = 2)  # for bigrams
+  collocations3 <- textstat_collocations(tokens, size = 3)  # for trigrams
+  
+  # create our bigram and trigram objects for sample without stopwords
+  collocations2_nostop <- textstat_collocations(tokens_nostop, size = 2)  # for bigrams
+  collocations3_nostop <- textstat_collocations(tokens_nostop, size = 3)  # for trigrams
+  
   # Save the corpus, tokens, and ngrams to RDS files
   saveRDS(corp, "Objects/corp.rds")
   saveRDS(tokens, "Objects/tokens.rds")
@@ -123,6 +199,12 @@ if (file.exists("Objects/corp.rds") &
   saveRDS(ngram3, "Objects/ngram3.rds")
   saveRDS(ngram4, "Objects/ngram4.rds")
   saveRDS(tokens_dfm, "Objects/tokens_dfm.rds")
+  
+  # save our bigram and trigram objects
+  saveRDS(collocations2, "Objects/collocations2.rds")
+  saveRDS(collocations3, "Objects/collocations3.rds")
+  saveRDS(collocations2_nostop, "Objects/collocations2_nostop.rds")
+  saveRDS(collocations3_nostop, "Objects/collocations3_nostop.rds")
 }
 
 # Update the digest files with the new modification times
