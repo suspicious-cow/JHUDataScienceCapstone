@@ -108,6 +108,9 @@ if (file.exists("Objects/corp.rds") &
   # Create the corpus, tokens, and ngrams
   corp <- corpus(full_data_sample)
   tokens <- tokens(corp)
+  
+  # remove punctuation
+  tokens <- tokens_remove(tokens, pattern = "\\p{P}", valuetype = "regex") 
   ngram2 <- tokens_ngrams(tokens, n = 2)
   ngram3 <- tokens_ngrams(tokens, n = 3)
   ngram4 <- tokens_ngrams(tokens, n = 4)
@@ -132,3 +135,8 @@ writeLines(blogs_sample_digest, con = "SampleData/blogs_sample_digest.txt")
 writeLines(news_sample_digest, con = "SampleData/news_sample_digest.txt")
 writeLines(twitter_sample_digest, con = "SampleData/twitter_sample_digest.txt")
 writeLines(full_data_sample_digest, con = "SampleData/full_data_sample_digest.txt")
+
+
+top_tokens <- topfeatures(tokens_dfm, n = 20) # change n to get more or less tokens
+
+print(top_tokens)
