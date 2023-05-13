@@ -35,7 +35,7 @@ for (file_path in file_paths) {
   close(con)
   
   # Add the results to the data frame
-  results <- rbind(results, data.frame(
+  initialfilemetrics <- rbind(results, data.frame(
     File = file_path,
     Line_Count = line_count,
     Word_Count = word_count,
@@ -43,5 +43,14 @@ for (file_path in file_paths) {
   ))
 }
 
+# save our object
+saveRDS(initialfilemetrics, "Objects/initialfilemetrics.rds")
+
+# read our object
+initialfilemetrics <- readRDS("Objects/initialfilemetrics.rds")
+
 # Print the results
-print(results)
+print(initialfilemetrics)
+
+
+
