@@ -12,7 +12,6 @@ required_libraries <- c("quanteda","quanteda.textmodels","quanteda.textstats",
                         "quanteda.textplots", "readtext", "text", "sqldf", 
                         "digest", "ggplot2")
 
-# Install missing packages and load all required libraries
 for (lib in required_libraries) {
   if (!requireNamespace(lib, quietly = TRUE)) {
     install.packages(lib)
@@ -219,5 +218,6 @@ writeLines(twitter_sample_digest, con = "SampleData/twitter_sample_digest.txt")
 writeLines(full_data_sample_digest, con = "SampleData/full_data_sample_digest.txt")
 
 
-
-
+##
+# Created by Zain Naboulsi for the Johns Hopkins Data Science Specialization Capstone Course 
+##
