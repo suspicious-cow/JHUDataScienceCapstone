@@ -4,10 +4,22 @@ print(initialfilemetrics)
 
 
 # ========================= BASIC ANALYSIS =================================
-# frequency of words
+# frequency of words with stops
 top_tokens <- topfeatures(tokens_dfm, n = 20) # change n to get more or less tokens
 
 print(top_tokens)
+
+# frequency of words wihtout stops
+# creating a histogram after we remove the stopwords for comparison
+tokens_nostop <- tokens_remove(tokens, pattern = stopwords("english"))
+tokens_dfm_nostop <- dfm(tokens_nostop)
+
+top_tokens_nostop <- topfeatures(tokens_dfm, n = 20)
+
+print(top_tokens_nostop)
+
+
+
 
 # word clouds
 # Set the base font size
@@ -68,15 +80,13 @@ ggplot(top_words, aes(x = reorder(feature, -frequency), y = frequency)) +
         axis.title = element_text(size = 14))
 
 
-# creating a histogram after we remove the stopwords for comparison
-tokens_nostop <- tokens_remove(tokens, pattern = stopwords("english"))
-tokens_dfm_nostop <- dfm(tokens_nostop)
 
 # Extract word frequencies
 freq_nostop <- textstat_frequency(tokens_dfm_nostop)
 
 # Sort in descending order and keep only the top 30 words
 top_words_nostop <- head(freq_nostop, 30)
+
 
 # Plot
 ggplot(top_words_nostop, aes(x = reorder(feature, -frequency), y = frequency)) +
