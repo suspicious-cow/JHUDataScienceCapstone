@@ -117,14 +117,7 @@ ggplot(top_words, aes(x = reorder(feature, -frequency), y = frequency)) +
         axis.text.x = element_text(size = 12),
         axis.title = element_text(size = 14))
 
-# Set the base font size
-par(cex = 3)  # Increase the size by 50%
 
-# Generate the word cloud
-textplot_wordcloud(tokens_dfm)
-
-# Reset the base font size to the default
-par(cex = 1)
 
 # ========================= WORD RELATIONSHIPS ===============================
 # Compute the feature co-occurrence matrix

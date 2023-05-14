@@ -213,8 +213,8 @@ if (file.exists("Objects/corp.rds") &
   corp <- corpus(full_data_sample)
   tokens <- tokens(corp)
   
-  # remove all non-aplhanumeric characters since they aren't interesting to us
-  tokens <- tokens_remove(tokens, pattern = "\\P{L}\\P{N}", valuetype = "regex") 
+  # remove all non-alphanumeric characters since they aren't interesting to us
+  tokens <- tokens_remove(tokens, pattern = "[^[:alnum:]]", valuetype = "regex") 
   tokens_dfm <- dfm(tokens)
   
   # generate our frequency distributions for bi,tri, and quad-grams
