@@ -9,12 +9,11 @@ top_tokens <- topfeatures(tokens_dfm, n = 20) # change n to get more or less tok
 
 print(top_tokens)
 
+
+
 # frequency of words wihtout stops
 # creating a histogram after we remove the stopwords for comparison
-tokens_nostop <- tokens_remove(tokens, pattern = stopwords("english"))
-tokens_dfm_nostop <- dfm(tokens_nostop)
-
-top_tokens_nostop <- topfeatures(tokens_dfm, n = 20)
+top_tokens_nostop <- topfeatures(tokens_dfm_nostop, n = 20)
 
 print(top_tokens_nostop)
 
@@ -136,14 +135,32 @@ print(fcm_matrix)
 
 
 
+# Print the top 10 most frequent 2-grams, 3-grams, and 4-grams
+print(head(ngram2, 10))
+print(head(ngram3, 10))
+print(head(ngram4, 10))
+
+# Print the total number of 2-grams, 3-grams, and 4-grams in the corpus
+print(length(ngram2))
+print(length(ngram3))
+print(length(ngram4))
+
+# Print the average frequency of 2-grams, 3-grams, and 4-grams in the corpus
+print(mean(ngram2))
+print(mean(ngram3))
+print(mean(ngram4))
+
+
 # print the top 10 collocations bigram and trigram objects for sample with stopwords
 head(collocations2, 10)
 head(collocations3, 10)
+head(collocations4, 10)
 
 
 # print the top 10 collocations bigram and trigram objects for sample without stopwords
 head(collocations2_nostop, 10)
 head(collocations3_nostop, 10)
+head(collocations4_nostop, 10)
 
 
 
