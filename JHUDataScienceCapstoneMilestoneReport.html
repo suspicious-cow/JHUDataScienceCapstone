@@ -11,7 +11,7 @@
 
 <meta name="author" content="Zain Naboulsi" />
 
-<meta name="date" content="2023-05-12" />
+<meta name="date" content="2023-05-13" />
 
 <title>Johns Hopkins University Data Science Capstone - Milestone Report</title>
 
@@ -375,13 +375,13 @@ display: none;
 <h1 class="title toc-ignore">Johns Hopkins University Data Science
 Capstone - Milestone Report</h1>
 <h4 class="author">Zain Naboulsi</h4>
-<h4 class="date">2023-05-12</h4>
+<h4 class="date">2023-05-13</h4>
 
 </div>
 
 <div id="TOC">
 <ul>
-<li><a href="#abstract" id="toc-abstract">Abstract</a></li>
+<li><a href="#introduction" id="toc-introduction">Introduction</a></li>
 <li><a href="#inital-data-load" id="toc-inital-data-load">Inital Data
 Load</a></li>
 <li><a href="#references" id="toc-references">References</a></li>
@@ -389,27 +389,25 @@ Load</a></li>
 </ul>
 </div>
 
-<div id="abstract" class="section level1">
-<h1>Abstract</h1>
-<p>In today’s digital landscape, individuals worldwide devote more time,
-perhaps too much time, to their mobile devices, engaging in various
-activities such as emailing, social networking, and banking. However,
-typing on these devices can pose difficulties. SwiftKey, the corporate
-partner for this capstone project, offers a solution with its smart
-keyboard that eases typing on mobile devices. A key feature of
-SwiftKey’s keyboard includes predictive text models, which suggest
-potential words to users based on their previous input. For example,
-after a user types “I went to the”, the keyboard could suggest “gym”,
-“store”, or “restaurant”. The goal of this capstone project involves
-both understanding and developing predictive text models similar to
-those SwiftKey employs.</p>
-<p>This project starts with analyzing a large body of text documents to
-understand data structure and word organization. This process includes
-cleaning and analyzing text data, followed by the construction and
-sampling of a predictive text model. The final goal is to create a
-predictive text product. We will be utilizing all the skills acquired
-during the Data Science Specialization, with a focus on text data
-analysis and natural language processing (NLP).</p>
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>Welcome to Zain Naboulsi’s Milestone Report for the Johns Hopkins
+Data Science Specialization. I appreciate you taking time to review my
+work and give feedback on my progress as well as thoughts on fitting a
+prediction model. Also, any insight you would like to share on the final
+plan for my Shiny application would be welcome.</p>
+<p>I started by taking three very large text files that were taken from
+blogs, news, and Twitter entries on the Internet. Initially, I had
+planned to do analysis on the entire set of data; however that idea
+quickly dissolved as my first attempt generating counts of each word
+took over sixteen hours to complete. Naturally, this was a
+non-starter.</p>
+<p>I then turned my full attention to the total size of the original
+source files to get a handle on what I should do with them:</p>
+<pre><code>##                             File Line_Count Word_Count
+## 1   SwiftKeyData/en_US.blogs.txt     899288   37334131
+## 2    SwiftKeyData/en_US.news.txt      77259    2643969
+## 3 SwiftKeyData/en_US.twitter.txt    2360148   30373543</code></pre>
 </div>
 <div id="inital-data-load" class="section level1">
 <h1>Inital Data Load</h1>
@@ -435,22 +433,294 @@ idea of the word frequency that exists.</p>
 </div>
 <div id="appendix-all-source-code" class="section level1">
 <h1>Appendix: All Source Code</h1>
-<pre class="r"><code># set a seed in case we use any random items
+<pre class="r"><code># run our setup code to obtain all the objects we will need to produce our data and graphs
+
+##
+# Created by Zain Naboulsi for the Johns Hopkins Data Science Specialization Capstone Course 
+##
+
+# set a seed in case we use anything that uses random numbers
 set.seed(1337)
 
 
 # Set the names of the packages and libraries you want to install
 # Most notably load up all the quanteda packages we will need
 required_libraries &lt;- c(&quot;quanteda&quot;,&quot;quanteda.textmodels&quot;,&quot;quanteda.textstats&quot;,
-                        &quot;quanteda.textplots&quot;)
+                        &quot;quanteda.textplots&quot;, &quot;readtext&quot;, &quot;text&quot;, &quot;sqldf&quot;, 
+                        &quot;digest&quot;, &quot;ggplot2&quot;)
 
-# Install missing packages and load all required libraries
 for (lib in required_libraries) {
   if (!requireNamespace(lib, quietly = TRUE)) {
     install.packages(lib)
   }
   library(lib, character.only = TRUE)
-}</code></pre>
+}
+
+
+# Get our initial file metrics on the original source files
+# see if we have an RDS file for the object we need
+if (file.exists(&quot;Objects/initialfilemetrics.rds&quot;)) {
+  
+  # if we do, read our object into memory from disk
+  initialfilemetrics &lt;- readRDS(&quot;Objects/initialfilemetrics.rds&quot;)
+  
+} else {
+  # Define our file paths
+  file_paths &lt;- c(&quot;SwiftKeyData/en_US.blogs.txt&quot;, &quot;SwiftKeyData/en_US.news.txt&quot;, &quot;SwiftKeyData/en_US.twitter.txt&quot;)
+  
+  # Initialize a data frame to store the results
+  initialfilemetrics &lt;- data.frame(
+    File = character(),
+    Line_Count = numeric(),
+    Word_Count = numeric(),
+    stringsAsFactors = FALSE
+  )
+  
+  # Process each file in our loop
+  for (file_path in file_paths) {
+    
+    # Initialize counters
+    line_count &lt;- 0
+    word_count &lt;- 0
+    
+    # Open a connection to the file
+    con &lt;- file(file_path, &quot;r&quot;)
+    
+    # Read the file line by line
+    while (TRUE) {
+      lines &lt;- readLines(con, n = 1)  # read one line at a time
+      
+      if (length(lines) == 0) {  # end of file
+        break
+      }
+      
+      # Update line and word counts
+      line_count &lt;- line_count + 1
+      word_count &lt;- word_count + length(strsplit(lines, &quot;\\s&quot;)[[1]])
+    }
+    
+    # Close the connection
+    close(con)
+    
+    # Add the results to the data frame for each file
+    initialfilemetrics &lt;- rbind(initialfilemetrics, data.frame(
+      File = file_path,
+      Line_Count = line_count,
+      Word_Count = word_count,
+      stringsAsFactors = FALSE
+    ))
+  }
+  
+  # save our object to disk
+  saveRDS(initialfilemetrics, &quot;Objects/initialfilemetrics.rds&quot;)
+}
+
+##
+# Created by Zain Naboulsi for the Johns Hopkins Data Science Specialization Capstone Course 
+##
+
+# Check if the digest files are missing
+if (!file.exists(&quot;Digests/blogs_sample_digest.txt&quot;) | 
+    !file.exists(&quot;Digests/news_sample_digest.txt&quot;) | 
+    !file.exists(&quot;Digests/twitter_sample_digest.txt&quot;)) {
+  
+  # if any digest file is missing then create them all to keep track of 
+  # when the data changes
+  blogs_sample_digest &lt;- digest(file.info(&quot;SampleData/blogs_sample.txt&quot;)$mtime)
+  write.table(blogs_sample_digest, file = &quot;Digests/blogs_sample_digest.txt&quot;, 
+              row.names = FALSE, col.names = FALSE, quote = FALSE, append = FALSE)
+  
+  news_sample_digest &lt;- digest(file.info(&quot;SampleData/news_sample.txt&quot;)$mtime)
+  write.table(news_sample_digest, file = &quot;Digests/news_sample_digest.txt&quot;, 
+              row.names = FALSE, col.names = FALSE, quote = FALSE, append = FALSE)
+  
+  twitter_sample_digest &lt;- digest(file.info(&quot;SampleData/twitter_sample.txt&quot;)$mtime)
+  write.table(twitter_sample_digest, file = &quot;Digests/twitter_sample_digest.txt&quot;, 
+              row.names = FALSE, col.names = FALSE, quote = FALSE, append = FALSE)
+  
+} else {
+  
+  # if no files are missing read in the digest information for all three files
+  blogs_sample_digest &lt;- readLines(&quot;Digests/blogs_sample_digest.txt&quot;)
+  news_sample_digest &lt;- readLines(&quot;Digests/news_sample_digest.txt&quot;)
+  twitter_sample_digest &lt;- readLines(&quot;Digests/twitter_sample_digest.txt&quot;)
+}
+
+
+# Define the function for sampling lines to use if we have changes to the data
+sample_lines2 &lt;- function(file, n) {
+  total_lines &lt;- sum(readLines(file) != &quot;&quot;)
+  p &lt;- n / total_lines
+  lines_sample &lt;- c()
+  con &lt;- file(file, &quot;r&quot;)
+  while(TRUE) {
+    line &lt;- readLines(con, n = 1)
+    if(length(line) == 0) {
+      break
+    }
+    if(runif(1) &lt; p) {
+      lines_sample &lt;- c(lines_sample, line)
+    }
+  }
+  close(con)
+  return(lines_sample)
+}
+
+
+# Check if the sample files have changed by looking at the modification times
+if (digest(file.info(&quot;SampleData/blogs_sample.txt&quot;)$mtime) != blogs_sample_digest |
+    digest(file.info(&quot;SampleData/news_sample.txt&quot;)$mtime) != news_sample_digest |
+    digest(file.info(&quot;SampleData/twitter_sample.txt&quot;)$mtime) != twitter_sample_digest) {
+  
+  # redo the seed to make sure the results are reproducible
+  set.seed(1337)
+  
+  # if there have been changes to the files then we need to sample the 
+  # lines from the new files again
+  sample_size &lt;- 10000
+  blogs_sample &lt;- sample_lines2(&quot;SwiftKeyData/en_US.blogs.txt&quot;, sample_size)
+  news_sample &lt;- sample_lines2(&quot;SwiftKeyData/en_US.news.txt&quot;, sample_size)
+  twitter_sample &lt;- sample_lines2(&quot;SwiftKeyData/en_US.twitter.txt&quot;, sample_size)
+  
+  # now let&#39;s save our sample files to disk
+  write.table(blogs_sample, file = &quot;SampleData/blogs_sample.txt&quot;, 
+              row.names = FALSE, col.names = FALSE, quote = FALSE, append = FALSE)
+  write.table(news_sample, file = &quot;SampleData/news_sample.txt&quot;, 
+              row.names = FALSE, col.names = FALSE, quote = FALSE, append = FALSE)
+  write.table(twitter_sample, file = &quot;SampleData/twitter_sample.txt&quot;, 
+              row.names = FALSE, col.names = FALSE, quote = FALSE, append = FALSE)
+  
+} else {
+  
+  # if none of the sample files have changed just use the already generated
+  # sample files
+  blogs_sample &lt;- readLines(&quot;SampleData/blogs_sample.txt&quot;)
+  news_sample &lt;- readLines(&quot;SampleData/news_sample.txt&quot;)
+  twitter_sample &lt;- readLines(&quot;SampleData/twitter_sample.txt&quot;)
+}
+
+# after everything is done, combine our three sample files into one
+full_data_sample &lt;- c(blogs_sample, news_sample, twitter_sample)
+
+# Check if all of our saved objects exist
+if (file.exists(&quot;Objects/corp.rds&quot;) &amp;
+    file.exists(&quot;Objects/tokens.rds&quot;) &amp;
+    file.exists(&quot;Objects/tokens_dfm.rds&quot;) &amp;
+    file.exists(&quot;Objects/ngram2.rds&quot;) &amp;
+    file.exists(&quot;Objects/ngram3.rds&quot;) &amp;
+    file.exists(&quot;Objects/ngram4.rds&quot;) &amp; 
+    file.exists(&quot;Objects/collocations2.rds&quot;) &amp;
+    file.exists(&quot;Objects/collocations3.rds&quot;) &amp;
+    file.exists(&quot;Objects/collocations4.rds&quot;) &amp;
+    file.exists(&quot;Objects/tokens_nostop.rds&quot;) &amp;
+    file.exists(&quot;Objects/tokens_dfm_nostop.rds&quot;) &amp;
+    file.exists(&quot;Objects/ngram2_nostop.rds&quot;) &amp;
+    file.exists(&quot;Objects/ngram3_nostop.rds&quot;) &amp;
+    file.exists(&quot;Objects/ngram4_nostop.rds&quot;) &amp; 
+    file.exists(&quot;Objects/collocations2_nostop.rds&quot;) &amp;
+    file.exists(&quot;Objects/collocations3_nostop.rds&quot;) &amp;
+    file.exists(&quot;Objects/collocations4_nostop.rds&quot;) 
+    
+    
+    ) {
+  
+  # if all of our saved objects are there then load them into memory
+  corp &lt;- readRDS(&quot;Objects/corp.rds&quot;)
+  tokens &lt;- readRDS(&quot;Objects/tokens.rds&quot;)
+  tokens_dfm &lt;- readRDS(&quot;Objects/tokens_dfm.rds&quot;)
+  ngram2 &lt;- readRDS(&quot;Objects/ngram2.rds&quot;)
+  ngram3 &lt;- readRDS(&quot;Objects/ngram3.rds&quot;)
+  ngram4 &lt;- readRDS(&quot;Objects/ngram4.rds&quot;)
+  collocations2 &lt;- readRDS(&quot;Objects/collocations2.rds&quot;)
+  collocations3 &lt;- readRDS(&quot;Objects/collocations3.rds&quot;)
+  collocations3 &lt;- readRDS(&quot;Objects/collocations4.rds&quot;)
+  tokens_nostop &lt;- readRDS(&quot;Objects/tokens_nostop.rds&quot;)
+  tokens_dfm_nostop &lt;- readRDS(&quot;Objects/tokens_dfm_nostop.rds&quot;)
+  ngram2_nostop &lt;- readRDS(&quot;Objects/ngram2_nostop.rds&quot;)
+  ngram3_nostop &lt;- readRDS(&quot;Objects/ngram3_nostop.rds&quot;)
+  ngram4_nostop &lt;- readRDS(&quot;Objects/ngram4_nostop.rds&quot;)
+  collocations2_nostop &lt;- readRDS(&quot;Objects/collocations2_nostop.rds&quot;)
+  collocations3_nostop &lt;- readRDS(&quot;Objects/collocations3_nostop.rds&quot;)
+  collocations3_nostop &lt;- readRDS(&quot;Objects/collocations4_nostop.rds&quot;)
+  
+} else {
+  
+  # if any saved objects are missing, then redo all the objects just to make
+  # sure we don&#39;t miss anything
+  
+  # Create the corpus and tokens objects
+  corp &lt;- corpus(full_data_sample)
+  tokens &lt;- tokens(corp)
+  
+  # remove all non-alphanumeric characters since they aren&#39;t interesting to us
+  tokens &lt;- tokens_remove(tokens, pattern = &quot;[^[:alnum:]]&quot;, valuetype = &quot;regex&quot;) 
+  tokens_dfm &lt;- dfm(tokens)
+  
+  # generate our frequency distributions for bi,tri, and quad-grams
+  # with stopwords
+  ngram2 &lt;- tokens_ngrams(tokens, n = 2)
+  ngram3 &lt;- tokens_ngrams(tokens, n = 3)
+  ngram4 &lt;- tokens_ngrams(tokens, n = 4)
+  
+  
+  # create our bigram and trigram objects for sample with stopwords
+  collocations2 &lt;- textstat_collocations(tokens, size = 2)  # for bi-grams
+  collocations3 &lt;- textstat_collocations(tokens, size = 3)  # for tri-grams
+  collocations4 &lt;- textstat_collocations(tokens, size = 4)  # for quad-grams
+  
+  # create tokens and dfm with stopwords removed
+  tokens_nostop &lt;- tokens_remove(tokens, pattern = stopwords(&quot;english&quot;))
+  tokens_dfm_nostop &lt;- dfm(tokens_nostop)
+  
+  # generate our frequency distributions for bi,tri, and quad-grams
+  # without stopwords
+  ngram2_nostop &lt;- tokens_ngrams(tokens_nostop, n = 2)
+  ngram3_nostop &lt;- tokens_ngrams(tokens_nostop, n = 3)
+  ngram4_nostop &lt;- tokens_ngrams(tokens_nostop, n = 4)
+  
+  # create our bigram and trigram objects for sample without stopwords
+  collocations2_nostop &lt;- textstat_collocations(tokens_nostop, size = 2)  # for bi-grams
+  collocations3_nostop &lt;- textstat_collocations(tokens_nostop, size = 3)  # for tri-grams
+  collocations4_nostop &lt;- textstat_collocations(tokens_nostop, size = 4)  # for quad-grams
+  
+  # Save the corpus, tokens, ngrams, and collocations to RDS files
+  saveRDS(corp, &quot;Objects/corp.rds&quot;)
+  saveRDS(tokens, &quot;Objects/tokens.rds&quot;)
+  saveRDS(tokens_dfm, &quot;Objects/tokens_dfm.rds&quot;)
+  saveRDS(ngram2, &quot;Objects/ngram2.rds&quot;)
+  saveRDS(ngram3, &quot;Objects/ngram3.rds&quot;)
+  saveRDS(ngram4, &quot;Objects/ngram4.rds&quot;)
+  saveRDS(collocations2, &quot;Objects/collocations2.rds&quot;)
+  saveRDS(collocations3, &quot;Objects/collocations3.rds&quot;)
+  saveRDS(collocations4, &quot;Objects/collocations4.rds&quot;)
+  saveRDS(tokens_nostop, &quot;Objects/tokens_nostop.rds&quot;)
+  saveRDS(tokens_dfm_nostop, &quot;Objects/tokens_dfm_nostop.rds&quot;)
+  saveRDS(ngram2_nostop, &quot;Objects/ngram2_nostop.rds&quot;)
+  saveRDS(ngram3_nostop, &quot;Objects/ngram3_nostop.rds&quot;)
+  saveRDS(ngram4_nostop, &quot;Objects/ngram4_nostop.rds&quot;)
+  saveRDS(collocations2_nostop, &quot;Objects/collocations2_nostop.rds&quot;)
+  saveRDS(collocations3_nostop, &quot;Objects/collocations3_nostop.rds&quot;)
+  saveRDS(collocations4_nostop, &quot;Objects/collocations4_nostop.rds&quot;)
+}
+
+# Update the digest files with the new modification times
+blogs_sample_digest &lt;- digest(file.info(&quot;SampleData/blogs_sample.txt&quot;)$mtime)
+news_sample_digest &lt;- digest(file.info(&quot;SampleData/news_sample.txt&quot;)$mtime)
+twitter_sample_digest &lt;- digest(file.info(&quot;SampleData/twitter_sample.txt&quot;)$mtime)
+full_data_sample_digest &lt;- digest(file.info(&quot;SampleData/full_data_sample.txt&quot;)$mtime)
+
+writeLines(blogs_sample_digest, con = &quot;SampleData/blogs_sample_digest.txt&quot;)
+writeLines(news_sample_digest, con = &quot;SampleData/news_sample_digest.txt&quot;)
+writeLines(twitter_sample_digest, con = &quot;SampleData/twitter_sample_digest.txt&quot;)
+writeLines(full_data_sample_digest, con = &quot;SampleData/full_data_sample_digest.txt&quot;)
+
+
+##
+# Created by Zain Naboulsi for the Johns Hopkins Data Science Specialization Capstone Course 
+##
+
+
+print(initialfilemetrics)</code></pre>
 </div>
 
 

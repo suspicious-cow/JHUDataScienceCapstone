@@ -10,7 +10,7 @@ set.seed(1337)
 # Most notably load up all the quanteda packages we will need
 required_libraries <- c("quanteda","quanteda.textmodels","quanteda.textstats",
                         "quanteda.textplots", "readtext", "text", "sqldf", 
-                        "digest", "ggplot2")
+                        "digest", "ggplot2", "dplyr", "gridExtra")
 
 for (lib in required_libraries) {
   if (!requireNamespace(lib, quietly = TRUE)) {
@@ -78,7 +78,9 @@ if (file.exists("Objects/initialfilemetrics.rds")) {
   saveRDS(initialfilemetrics, "Objects/initialfilemetrics.rds")
 }
 
-
+##
+# Created by Zain Naboulsi for the Johns Hopkins Data Science Specialization Capstone Course 
+##
 
 # Check if the digest files are missing
 if (!file.exists("Digests/blogs_sample_digest.txt") | 
