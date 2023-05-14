@@ -32,7 +32,7 @@ if (file.exists("Objects/initialfilemetrics.rds")) {
   file_paths <- c("SwiftKeyData/en_US.blogs.txt", "SwiftKeyData/en_US.news.txt", "SwiftKeyData/en_US.twitter.txt")
   
   # Initialize a data frame to store the results
-  results <- data.frame(
+  initialfilemetrics <- data.frame(
     File = character(),
     Line_Count = numeric(),
     Word_Count = numeric(),
@@ -51,7 +51,7 @@ if (file.exists("Objects/initialfilemetrics.rds")) {
     
     # Read the file line by line
     while (TRUE) {
-      lines <- readLines(con, n = 1, skipNul = TRUE)  # read one line at a time
+      lines <- readLines(con, n = 1)  # read one line at a time
       
       if (length(lines) == 0) {  # end of file
         break
@@ -66,7 +66,7 @@ if (file.exists("Objects/initialfilemetrics.rds")) {
     close(con)
     
     # Add the results to the data frame for each file
-    initialfilemetrics <- rbind(results, data.frame(
+    initialfilemetrics <- rbind(initialfilemetrics, data.frame(
       File = file_path,
       Line_Count = line_count,
       Word_Count = word_count,
