@@ -345,12 +345,12 @@ critical decision: Should we include stopwords? Traditionally, stopwords such as
 "an", "the", "or", etc... are removed for analysis. However, our goal is to 
 create a prediction model on the next word(s) that will occur in a sequence. 
 Stopwords are an integral part of sentence structure and, therefore, should 
-probably be left in for analysis. For the time, being we decided to do 
-preliminary on data with and without stopwords for comparison. 
+probably be left in for analysis. For the time being, we decided to do 
+preliminary analysis on data with and without stopwords for comparison. 
 
 ## Data Sample Files Validation
-Our tovalidate our sample files we used bootstrapping, a statistical resampling 
-method, to understand the distribution of unique words in three types of 
+To validate our sample files we used bootstrapping, a statistical resampling 
+method, to understand the distribution of unique words in our three types of 
 samples: blog posts, news articles, and Twitter messages. Bootstrapping lets us 
 draw multiple samples from our original data. By doing this 5000 times for each 
 data file sample, we can calculate the average (mean) and variability (standard 
@@ -421,13 +421,19 @@ summary_stats_df <- data.frame(t(summary_stats))
 names(summary_stats_df) <- c("Mean", "Standard Deviation")
 rownames(summary_stats_df) <- c("Blogs", "News", "Twitter")
 
+cat("Summary Statistics Without Stopwords", "\n")
 print(summary_stats_df)
 
 
 ```
 
 
-This suggests that blog and news data tend to have a higher average number of unique words and more variability compared to Twitter, which shows greater consistency, possibly due to its character limit. Remember, the validity of these bootstrap samples hinges on the original samples being representative of all blog posts, news articles, and tweets. Bias in the original sample will also be reflected in the bootstrap samples.
+These results suggest that blog and news data tend to have a higher average 
+number of unique words and more variability compared to Twitter, which shows 
+greater consistency, possibly due to its character limit. Remember, the validity 
+of these bootstrap samples hinges on the original samples being representative 
+of all blog posts, news articles, and tweets. Bias in the original sample will 
+also be reflected in the bootstrap samples.
 
 The below graph, a set of histograms, a snapshot of the variety of words in our 
 sample files from blogs, news, and Twitter. It helps us visualize and understand 
@@ -437,8 +443,8 @@ samples. By looking at these bars, we can see the most common outcomes (where
 the bars are highest), how spread out the outcomes are, and whether the spread 
 is even or leans more one way or the other.
 
-The shape of these histograms can tell us a lot. For example, the histogram for 
-blogs and news looks different from the one for Twitter, this suggests that the 
+The shape of these histograms can tell us a lot. For example, the histograms for 
+blogs and news looks different from the one for Twitter. This suggests that the 
 there are different patterns of word use. Where blogs and news have similar 
 patterns and, therefore, word use; Twitter does not follow this pattern. This 
 could be because of the nature of the content, or even Twitter's character 

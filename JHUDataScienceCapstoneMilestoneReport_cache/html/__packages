@@ -10,3 +10,5 @@ RSQLite
 sqldf
 digest
 ggplot2
+dplyr
+gridExtra

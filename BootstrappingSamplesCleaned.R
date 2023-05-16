@@ -62,7 +62,9 @@ summary_stats_df <- data.frame(t(summary_stats))
 names(summary_stats_df) <- c("Mean", "Standard Deviation")
 rownames(summary_stats_df) <- c("Blogs", "News", "Twitter")
 
+cat("Summary Statistics Without Stopwords", "\n")
 print(summary_stats_df)
+
 
 
 ggplot(bootstrap_results_long, aes(x = value, fill = variable)) + 
