@@ -34,7 +34,7 @@ set.seed(1337)
 # Most notably load up all the quanteda packages we will need
 required_libraries <- c("quanteda","quanteda.textmodels","quanteda.textstats",
                         "quanteda.textplots", "readtext", "text", "sqldf", 
-                        "digest", "ggplot2", "dplyr", "gridExtra")
+                        "digest", "ggplot2", "dplyr", "gridExtra", "broom","tidyverse")
 
 for (lib in required_libraries) {
   if (!requireNamespace(lib, quietly = TRUE)) {
@@ -220,7 +220,7 @@ if (file.exists("Objects/corp.rds") &
   ngram4 <- readRDS("Objects/ngram4.rds")
   collocations2 <- readRDS("Objects/collocations2.rds")
   collocations3 <- readRDS("Objects/collocations3.rds")
-  collocations3 <- readRDS("Objects/collocations4.rds")
+  collocations4 <- readRDS("Objects/collocations4.rds")
   tokens_nostop <- readRDS("Objects/tokens_nostop.rds")
   tokens_dfm_nostop <- readRDS("Objects/tokens_dfm_nostop.rds")
   ngram2_nostop <- readRDS("Objects/ngram2_nostop.rds")
@@ -228,7 +228,7 @@ if (file.exists("Objects/corp.rds") &
   ngram4_nostop <- readRDS("Objects/ngram4_nostop.rds")
   collocations2_nostop <- readRDS("Objects/collocations2_nostop.rds")
   collocations3_nostop <- readRDS("Objects/collocations3_nostop.rds")
-  collocations3_nostop <- readRDS("Objects/collocations4_nostop.rds")
+  collocations4_nostop <- readRDS("Objects/collocations4_nostop.rds")
   
 } else {
   
@@ -305,6 +305,7 @@ writeLines(full_data_sample_digest, con = "SampleData/full_data_sample_digest.tx
 ##
 # Created by Zain Naboulsi for the Johns Hopkins Data Science Specialization Capstone Course 
 ##
+
 
 
 ```
@@ -555,7 +556,7 @@ ggplot(bootstrap_results_long_allwords, aes(x = value, fill = variable)) +
 ```
 
 
-## Combining the Samples  
+## Combining and Analyzing the Samples  
 
 ### Frequency Histograms
 Having validated our samples individually, we combined them into one file to 
@@ -572,6 +573,7 @@ the frequency of these words, unveiling the most common themes or topics in our
 data. This rigorous approach to study word frequency, with and without 
 stopwords, is a cornerstone of text analysis, and allows us to garner a more 
 profound understanding of the data. 
+
 ```{r combined_word_frequency_histograms, echo = FALSE, warning = FALSE, error = FALSE, message = FALSE, appendix = TRUE, cache = TRUE}
 # Generate frequency histogram of data with stopwords
 
@@ -619,7 +621,9 @@ ggplot(top_words_nostop, aes(x = reorder(feature, -frequency), y = frequency)) +
 
 ```
 
-### Feature Co-Occcurrence Matrix
+### Multi-Word Analysis
+
+#### Feature Co-Occcurrence Matrix
 Next, we created a feature co-occurrence matrix (FCM), which is a fundamental 
 concept in text analysis. The FCM records how often different words (or 
 "features") appear together within a specified context window. In this case, 
@@ -643,12 +647,32 @@ fcm_matrix <- fcm(tokens)
 print(fcm_matrix)
 
 ```
+#### N-Gram Versus Collocation Analysis
+N-gram analysis and collocation analysis are two ways we look at patterns in 
+text, but they do it a bit differently.
 
-### N-Gram Analysis  
+In N-gram analysis, we look at word clusters or sequences. Think of an N-gram as 
+a chain of words of length N. For example, in "I love dogs", "I love" and 
+"love dogs" are pairs, or bi-grams. Here, we're mostly interested in how often 
+these word chains show up in the text. We aren't really looking at the meaning 
+between the words.
+
+Collocation analysis, however, is all about words that are found together more 
+often than you'd expect by random chance. It's not just about counting word 
+sequences, but about the meaningful relationship between them. For example, in 
+English, we tend to say "make a decision" not "do a decision". Even though 
+"make a" and "do a" could both be bi-grams, "make a decision" is a collocation 
+because "make" and "decision" go together.
+
+So, while N-gram analysis is like counting word clusters, collocation analysis 
+goes a step further, looking at the meaning and context of words that often come 
+together. Next, we will look at both these analyses on our combined data sample.
+
+#### N-Gram Analysis  
 N-gram analysis serves as a powerful method in the field of text analytics, 
 revealing patterns in data that single-word analysis might miss. It investigates 
-combinations of words, from pairs (2-grams) to triplets (3-grams) and 
-quadruplets (4-grams). This approach helps to identify frequently occurring 
+combinations of words, from pairs (bi-grams) to triplets (tri-grams) and 
+quadruplets (quad-grams). This approach helps to identify frequently occurring 
 phrases, which can be insightful for understanding prevalent themes or topics in 
 the data. The focus is not only on isolated words but their interplay, providing 
 a more context-rich analysis.
@@ -662,6 +686,7 @@ providing a quantitative perspective to the qualitative data. Visualizing this
 data further aids in highlighting the significant n-grams in the data corpus. 
 Overall, n-gram analysis is a potent tool in text analytics, contributing to a 
 more nuanced understanding of textual data.  
+
 ```{r ngram_analysis, echo = FALSE, warning = FALSE, error = FALSE, message = FALSE, appendix = TRUE, cache = TRUE}
 # Convert tokens to dfm
 dfm2 <- dfm(ngram2)
@@ -696,6 +721,61 @@ ggplot(df_combined, aes(x = reorder(ngram, -freq), y = freq, fill = order)) +
        subtitle = "Comparing 2-grams, 3-grams, and 4-grams")
 
 ```
+
+#### Collocation Analysis
+Similiar to n-gram analysis, we focus on the frequency of word pairs, triplets, 
+and quartets in a text. For example, "in the" or "will be" are pairs of words, 
+"more and more" is a triplet, and "the way to the" is a quartet. The numbers in 
+the output ('count') indicate how often these word groups appear in the text.
+
+The values 'lambda' and 'z' provide additional information about these word 
+groups. 'Lambda' measures the strength of the word groupings, comparing how 
+often the words come together against their individual appearances. The 'z' 
+score helps identify word combinations that occur more often than expected by 
+chance. These measures can aid in predicting what word might follow a given 
+series of words, crucial for language modeling.
+
+Understanding these patterns in language use is essential when building a model 
+to predict the next word in a sequence. These patterns become the basis for 
+making predictions. The more accurately these patterns are quantified, the 
+better the model can anticipate the next word. This results in improved 
+predictive models that enhance performance in tasks such as text completion, 
+text generation, and machine translation.  
+
+```{r collocation_analysis, echo = FALSE, warning = FALSE, error = FALSE, message = FALSE, appendix = TRUE, cache = TRUE}
+
+# print the top 10 collocations objects for sample with stopwords
+cat("Collocations with Stopwords")
+head(collocations2, 10)
+head(collocations3, 10)
+head(collocations4, 10)
+
+# print the top 10 collocations objects for sample without stopwords
+cat("Collocations without Stopwords")
+head(collocations2_nostop, 10)
+head(collocations3_nostop, 10)
+head(collocations4_nostop, 10)
+
+```
+
+# Prediction and Packaging  
+Given the analysis we have already done, it's likely that we will fit a 
+prediction model using a machine learning approach, such as a neural network or 
+a transformer-based model. These types of models are well-suited for language 
+processing since they can learn complex patterns. This helps them predict the 
+next word in a sequence. Our model will be learning from the relationships 
+between n-grams and collocations we've observed. By understanding the patterns, 
+the model can make predictions about the next word or words in a given context, 
+ultimately improving its performance in text generation and autocompletion.
+
+To create a user-friendly experience, we plan to develop a Shiny app that allows 
+users to put in a sequence of words and receive predictions. Shiny is a powerful 
+web framework for R that enables building interactive web applications, making 
+it an ideal choice for this project. The app would integrate our prediction 
+model, where users can enter their word sequence and receive suggestions for 
+what will come next. This could be useful in various applications, such as 
+helping users compose text more efficiently, or even offering insights into 
+common language patterns that might be relevant.
 
 
 \newpage

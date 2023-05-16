@@ -12,3 +12,12 @@ digest
 ggplot2
 dplyr
 gridExtra
+broom
+tidyverse
+tibble
+tidyr
+readr
+purrr
+stringr
+forcats
+lubridate

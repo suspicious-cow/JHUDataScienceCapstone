@@ -121,13 +121,15 @@ ggplot(df_combined, aes(x = reorder(ngram, -freq), y = freq, fill = order)) +
 
 
 
-# print the top 10 collocations bigram and trigram objects for sample with stopwords
+# print the top 10 collocations objects for sample with stopwords
+cat("Collocations with Stopwords")
 head(collocations2, 10)
 head(collocations3, 10)
 head(collocations4, 10)
 
 
-# print the top 10 collocations bigram and trigram objects for sample without stopwords
+# print the top 10 collocations objects for sample without stopwords
+cat("Collocations without Stopwords")
 head(collocations2_nostop, 10)
 head(collocations3_nostop, 10)
 head(collocations4_nostop, 10)
