@@ -19,7 +19,7 @@ editor_options:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-```{r, echo = FALSE, warning = FALSE, error = FALSE, message = FALSE, appendix = TRUE}
+```{r sample_creation, echo = FALSE, warning = FALSE, error = FALSE, message = FALSE, appendix = TRUE}
 # run our setup code to obtain all the objects we will need to produce our data and graphs
 
 ##
@@ -327,7 +327,7 @@ hours to complete. Naturally, this was a non-starter.
 We then turned our full attention to the total size of the original source files 
 to get a handle on what we should do with them:
 
-```{r, echo = FALSE, warning = FALSE, error = FALSE, message = FALSE, appendix = TRUE}
+```{r initial_file_metrics, echo = FALSE, warning = FALSE, error = FALSE, message = FALSE, appendix = TRUE}
 print(initialfilemetrics)
 ```
 As you can see the files are quite large with a vast amount of data in them. 
@@ -356,7 +356,7 @@ draw multiple samples from our original data. By doing this 5000 times for each
 data file sample, we can calculate the average (mean) and variability (standard 
 deviation) of unique words in each sample.
 
-```{r, echo = FALSE, warning = FALSE, error = FALSE, message = FALSE, appendix = TRUE, cache = TRUE}
+```{r bootstrap_results, echo = FALSE, warning = FALSE, error = FALSE, message = FALSE, appendix = TRUE, cache = TRUE}
 
 # check and see if our bootstap object is already saved
 if (file.exists("Objects/bootstrap_results_list.rds")) {
@@ -452,7 +452,7 @@ limit. In short, these histograms not only help validate our samples but also
 offer insights into the differences in language use across these platforms. 
 
 
-```{r, echo = FALSE, warning = FALSE, error = FALSE, message = FALSE, appendix = TRUE, cache = TRUE}
+```{r bootstrap_results_histograms, echo = FALSE, warning = FALSE, error = FALSE, message = FALSE, appendix = TRUE, cache = TRUE}
 ggplot(bootstrap_results_long, aes(x = value, fill = variable)) + 
   geom_histogram(bins = 30, color = "black", alpha = 0.7) +  
   scale_fill_manual(values = c("#F8766D", "#00BA38", "#619CFF")) +  
@@ -490,7 +490,7 @@ the frequency of these words, unveiling the most common themes or topics in our
 data. This rigorous approach to study word frequency, with and without 
 stopwords, is a cornerstone of text analysis, and allows us to garner a more 
 profound understanding of the data. 
-```{r, echo = FALSE, warning = FALSE, error = FALSE, message = FALSE, appendix = TRUE, cache = TRUE}
+```{r combined_word_frequency_histograms, echo = FALSE, warning = FALSE, error = FALSE, message = FALSE, appendix = TRUE, cache = TRUE}
 # Generate frequency histogram of data with stopwords
 
 # Extract word frequencies
@@ -553,7 +553,7 @@ Unfortunately, FCM can be particularly large if the dataset contains many unique
 words, which ours does. Our matrix size is 125,314 rows by 125,314 columns, but 
 only a portion of it is shown due to size constraints. An FCM is a powerful tool 
 for understanding relationships between words.
-```{r, echo = FALSE, warning = FALSE, error = FALSE, message = FALSE, appendix = TRUE, cache = TRUE}
+```{r combined_fcm, echo = FALSE, warning = FALSE, error = FALSE, message = FALSE, appendix = TRUE, cache = TRUE}
 # Compute the feature co-occurrence matrix
 fcm_matrix <- fcm(tokens)
 
