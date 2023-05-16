@@ -196,7 +196,7 @@ if (file.exists("Objects/corp.rds") &
   ngram4 <- readRDS("Objects/ngram4.rds")
   collocations2 <- readRDS("Objects/collocations2.rds")
   collocations3 <- readRDS("Objects/collocations3.rds")
-  collocations3 <- readRDS("Objects/collocations4.rds")
+  collocations4 <- readRDS("Objects/collocations4.rds")
   tokens_nostop <- readRDS("Objects/tokens_nostop.rds")
   tokens_dfm_nostop <- readRDS("Objects/tokens_dfm_nostop.rds")
   ngram2_nostop <- readRDS("Objects/ngram2_nostop.rds")
@@ -204,7 +204,7 @@ if (file.exists("Objects/corp.rds") &
   ngram4_nostop <- readRDS("Objects/ngram4_nostop.rds")
   collocations2_nostop <- readRDS("Objects/collocations2_nostop.rds")
   collocations3_nostop <- readRDS("Objects/collocations3_nostop.rds")
-  collocations3_nostop <- readRDS("Objects/collocations4_nostop.rds")
+  collocations4_nostop <- readRDS("Objects/collocations4_nostop.rds")
   
 } else {
   

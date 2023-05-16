@@ -104,7 +104,7 @@ df4$order <- "4-gram"
 # Combine the data frames
 df_combined <- bind_rows(df2, df3, df4)
 
-# Plot
+# Plot our n-gram data
 ggplot(df_combined, aes(x = reorder(ngram, -freq), y = freq, fill = order)) +
   geom_bar(stat = "identity", position = "dodge") +
   theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
