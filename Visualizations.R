@@ -81,15 +81,44 @@ print(head(ngram2, 10))
 print(head(ngram3, 10))
 print(head(ngram4, 10))
 
-# Print the total number of 2-grams, 3-grams, and 4-grams in the corpus
-print(length(ngram2))
-print(length(ngram3))
-print(length(ngram4))
+# Convert tokens to dfm
+dfm2 <- dfm(ngram2)
+dfm3 <- dfm(ngram3)
+dfm4 <- dfm(ngram4)
 
-# Print the average frequency of 2-grams, 3-grams, and 4-grams in the corpus
-print(mean(ngram2))
-print(mean(ngram3))
-print(mean(ngram4))
+top_ngrams2 <- topfeatures(dfm2, n = 10)
+top_ngrams3 <- topfeatures(dfm3, n = 10)
+top_ngrams4 <- topfeatures(dfm4, n = 10)
+
+
+# Convert to data frames
+df2 <- data.frame(ngram = names(top_ngrams2), freq = unname(top_ngrams2))
+df3 <- data.frame(ngram = names(top_ngrams3), freq = unname(top_ngrams3))
+df4 <- data.frame(ngram = names(top_ngrams4), freq = unname(top_ngrams4))
+
+# Add a column to identify the n-gram order
+df2$order <- "2-gram"
+df3$order <- "3-gram"
+df4$order <- "4-gram"
+
+# Combine the data frames
+df_combined <- bind_rows(df2, df3, df4)
+
+# Plot
+ggplot(df_combined, aes(x = reorder(ngram, -freq), y = freq, fill = order)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  facet_wrap(~order, scales = "free") +
+  labs(x = "N-gram", y = "Frequency", fill = "Order",
+       title = "Top 10 N-grams in Text Data",
+       subtitle = "Comparing 2-grams, 3-grams, and 4-grams")
+
+
+
+
+
+
+
 
 
 # print the top 10 collocations bigram and trigram objects for sample with stopwords

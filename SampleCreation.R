@@ -10,7 +10,7 @@ set.seed(1337)
 # Most notably load up all the quanteda packages we will need
 required_libraries <- c("quanteda","quanteda.textmodels","quanteda.textstats",
                         "quanteda.textplots", "readtext", "text", "sqldf", 
-                        "digest", "ggplot2", "dplyr", "gridExtra", "broom")
+                        "digest", "ggplot2", "dplyr", "gridExtra", "broom","tidyverse")
 
 for (lib in required_libraries) {
   if (!requireNamespace(lib, quietly = TRUE)) {

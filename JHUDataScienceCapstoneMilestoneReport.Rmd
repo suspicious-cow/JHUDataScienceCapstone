@@ -562,6 +562,60 @@ print(fcm_matrix)
 
 ```
 
+### N-Gram Analysis  
+N-gram analysis serves as a powerful method in the field of text analytics, 
+revealing patterns in data that single-word analysis might miss. It investigates 
+combinations of words, from pairs (2-grams) to triplets (3-grams) and 
+quadruplets (4-grams). This approach helps to identify frequently occurring 
+phrases, which can be insightful for understanding prevalent themes or topics in 
+the data. The focus is not only on isolated words but their interplay, providing 
+a more context-rich analysis.
+
+The procedure begins by finding frequently occurring n-grams in the text. This 
+step helps to distill a vast amount of textual information into manageable and 
+insightful data. The identified n-grams are then organized into a structured 
+format, such as data frames, allowing for a more seamless analysis. This 
+structured data can facilitate the comparison of different n-gram frequencies, 
+providing a quantitative perspective to the qualitative data. Visualizing this 
+data further aids in highlighting the significant n-grams in the data corpus. 
+Overall, n-gram analysis is a potent tool in text analytics, contributing to a 
+more nuanced understanding of textual data.  
+```{r ngram_analysis, echo = FALSE, warning = FALSE, error = FALSE, message = FALSE, appendix = TRUE, cache = TRUE}
+# Convert tokens to dfm
+dfm2 <- dfm(ngram2)
+dfm3 <- dfm(ngram3)
+dfm4 <- dfm(ngram4)
+
+top_ngrams2 <- topfeatures(dfm2, n = 10)
+top_ngrams3 <- topfeatures(dfm3, n = 10)
+top_ngrams4 <- topfeatures(dfm4, n = 10)
+
+
+# Convert to data frames
+df2 <- data.frame(ngram = names(top_ngrams2), freq = unname(top_ngrams2))
+df3 <- data.frame(ngram = names(top_ngrams3), freq = unname(top_ngrams3))
+df4 <- data.frame(ngram = names(top_ngrams4), freq = unname(top_ngrams4))
+
+# Add a column to identify the n-gram order
+df2$order <- "2-gram"
+df3$order <- "3-gram"
+df4$order <- "4-gram"
+
+# Combine the data frames
+df_combined <- bind_rows(df2, df3, df4)
+
+# Plot
+ggplot(df_combined, aes(x = reorder(ngram, -freq), y = freq, fill = order)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  facet_wrap(~order, scales = "free") +
+  labs(x = "N-gram", y = "Frequency", fill = "Order",
+       title = "Top 10 N-grams in Text Data",
+       subtitle = "Comparing 2-grams, 3-grams, and 4-grams")
+
+```
+
+
 \newpage
 # References  
 
