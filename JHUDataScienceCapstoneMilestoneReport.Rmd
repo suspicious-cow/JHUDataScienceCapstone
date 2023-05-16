@@ -34,7 +34,7 @@ set.seed(1337)
 # Most notably load up all the quanteda packages we will need
 required_libraries <- c("quanteda","quanteda.textmodels","quanteda.textstats",
                         "quanteda.textplots", "readtext", "text", "sqldf", 
-                        "digest", "ggplot2")
+                        "digest", "ggplot2", "dplyr", "gridExtra")
 
 for (lib in required_libraries) {
   if (!requireNamespace(lib, quietly = TRUE)) {
@@ -164,7 +164,7 @@ if (digest(file.info("SampleData/blogs_sample.txt")$mtime) != blogs_sample_diges
   
   # if there have been changes to the files then we need to sample the 
   # lines from the new files again
-  sample_size <- 10000
+  sample_size <- 50000
   blogs_sample <- sample_lines2("SwiftKeyData/en_US.blogs.txt", sample_size)
   news_sample <- sample_lines2("SwiftKeyData/en_US.news.txt", sample_size)
   twitter_sample <- sample_lines2("SwiftKeyData/en_US.twitter.txt", sample_size)
@@ -333,14 +333,136 @@ print(initialfilemetrics)
 As you can see the files are quite large with a vast amount of data in them. 
 Their size, however, precludes us being able to have reasonable performance when 
 running our analysis against them. We need to reduce the size of the data being 
-analyzed.
+analyzed. To do this, we opted to take a random sample of fifty thousand lines 
+from each of the original files (blogs, news, and Twitter). 
 
-To do this, we opted to take a random sample of ten thousand lines from each of 
-the original files (blogs, news, and Twitter). 
+# Analysis  
 
+## Stopwords
+
+At this point we were ready to do some analysis but we first had to make a 
+critical decision: Should we include stopwords? Traditionally, stopwords such as 
+"an", "the", "or", etc... are removed for analysis. However, our goal is to 
+create a prediction model on the next word(s) that will occur in a sequence. 
+Stopwords are an integral part of sentence structure and, therefore, should 
+probably be left in for analysis. For the time, being we decided to do 
+preliminary on data with and without stopwords for comparison. 
+
+## Data Sample Files Validation
+Our tovalidate our sample files we used bootstrapping, a statistical resampling 
+method, to understand the distribution of unique words in three types of 
+samples: blog posts, news articles, and Twitter messages. Bootstrapping lets us 
+draw multiple samples from our original data. By doing this 5000 times for each 
+data file sample, we can calculate the average (mean) and variability (standard 
+deviation) of unique words in each sample.
 
 ```{r, echo = FALSE, warning = FALSE, error = FALSE, message = FALSE, appendix = TRUE, cache = TRUE}
 
+# check and see if our bootstap object is already saved
+if (file.exists("Objects/bootstrap_results_list.rds")) {
+  
+  # if it is then read our bootstrap object into memory from disk
+  bootstrap_results_list <- readRDS("Objects/bootstrap_results_list.rds")
+  
+} else {
+  # Function to process a file and generate bootstrap samples
+  bootstrap_unique_words <- function(file_path, n_bootstrap) {
+    # Read the file
+    text <- readLines(file_path, warn = FALSE)
+    
+    # Tokenize the text
+    tokens <- tokens(text, what = "word", remove_punct = TRUE, remove_symbols = TRUE, remove_numbers = TRUE) %>%
+      tokens_tolower() %>%
+      tokens_remove(stopwords("english"))
+    
+    # Generate bootstrap samples and compute the number of unique tokens
+    n_unique <- numeric(n_bootstrap)
+    for (i in 1:n_bootstrap) {
+      bootstrap_sample <- sample(tokens, size = length(tokens), replace = TRUE)
+      n_unique[i] <- ntype(bootstrap_sample)
+    }
+    
+    return(n_unique)
+  }
+  
+  
+# Define our file paths
+file_paths <- c("SampleData/blogs_sample.txt", "SampleData/news_sample.txt", "SampleData/twitter_sample.txt")  
+
+
+# Number of bootstrap samples
+n_bootstrap <- 5000
+
+# Perform bootstrap sampling for each file
+bootstrap_results_list <- lapply(file_paths, bootstrap_unique_words, n_bootstrap = n_bootstrap)
+
+# save the bootstrap_results_list object to disk
+saveRDS(bootstrap_results_list, "Objects/bootstrap_results_list.rds")
+  
+}
+
+
+
+# Combine the results into a data frame for plotting
+bootstrap_results_df <- data.frame(
+  Blogs = bootstrap_results_list[[1]],
+  News = bootstrap_results_list[[2]],
+  Twitter = bootstrap_results_list[[3]]
+)
+
+# Melt the data frame to long format
+bootstrap_results_long <- reshape2::melt(bootstrap_results_df)
+
+# Compute the mean and standard deviation of the number of unique words for each source file
+summary_stats <- sapply(bootstrap_results_list, function(x) c(mean = mean(x), sd = sd(x)))
+
+# Convert to a data frame for easier viewing
+summary_stats_df <- data.frame(t(summary_stats))
+names(summary_stats_df) <- c("Mean", "Standard Deviation")
+rownames(summary_stats_df) <- c("Blogs", "News", "Twitter")
+
+print(summary_stats_df)
+
+
+```
+
+
+This suggests that blog and news data tend to have a higher average number of unique words and more variability compared to Twitter, which shows greater consistency, possibly due to its character limit. Remember, the validity of these bootstrap samples hinges on the original samples being representative of all blog posts, news articles, and tweets. Bias in the original sample will also be reflected in the bootstrap samples.
+
+The below graph, a set of histograms, a snapshot of the variety of words in our 
+sample files from blogs, news, and Twitter. It helps us visualize and understand 
+the patterns and variability in our data. Each bar in the histogram represents 
+the frequency of a specific range of unique word counts from our bootstrap 
+samples. By looking at these bars, we can see the most common outcomes (where 
+the bars are highest), how spread out the outcomes are, and whether the spread 
+is even or leans more one way or the other.
+
+The shape of these histograms can tell us a lot. For example, the histogram for 
+blogs and news looks different from the one for Twitter, this suggests that the 
+there are different patterns of word use. Where blogs and news have similar 
+patterns and, therefore, word use; Twitter does not follow this pattern. This 
+could be because of the nature of the content, or even Twitter's character 
+limit. In short, these histograms not only help validate our samples but also 
+offer insights into the differences in language use across these platforms. 
+
+
+```{r, echo = FALSE, warning = FALSE, error = FALSE, message = FALSE, appendix = TRUE, cache = TRUE}
+ggplot(bootstrap_results_long, aes(x = value, fill = variable)) + 
+  geom_histogram(bins = 30, color = "black", alpha = 0.7) +  
+  scale_fill_manual(values = c("#F8766D", "#00BA38", "#619CFF")) +  
+  facet_wrap(~ variable, scales = "free_x") +
+  theme_minimal() +
+  theme(
+    text = element_text(size = 14),  
+    legend.position = "bottom",  
+    plot.title = element_text(hjust = 0.5)  
+  ) +
+  labs(
+    title = "Bootstrap Sample Unique Word Counts (No Stopwords)", 
+    y = "Frequency", 
+    x = "Number of Unique Words", 
+    fill = "Text Source"  
+  )
 
 ```
 

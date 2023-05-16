@@ -140,7 +140,7 @@ if (digest(file.info("SampleData/blogs_sample.txt")$mtime) != blogs_sample_diges
   
   # if there have been changes to the files then we need to sample the 
   # lines from the new files again
-  sample_size <- 10000
+  sample_size <- 50000
   blogs_sample <- sample_lines2("SwiftKeyData/en_US.blogs.txt", sample_size)
   news_sample <- sample_lines2("SwiftKeyData/en_US.news.txt", sample_size)
   twitter_sample <- sample_lines2("SwiftKeyData/en_US.twitter.txt", sample_size)
