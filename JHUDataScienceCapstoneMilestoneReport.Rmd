@@ -337,9 +337,7 @@ running our analysis against them. We need to reduce the size of the data being
 analyzed. To do this, we opted to take a random sample of fifty thousand lines 
 from each of the original files (blogs, news, and Twitter). 
 
-# Analysis  
-
-## Stopwords
+# Using Stopwords
 
 At this point we were ready to do some analysis but we first had to make a 
 critical decision: Should we include stopwords? Traditionally, stopwords such as 
@@ -349,7 +347,7 @@ Stopwords are an integral part of sentence structure and, therefore, should
 probably be left in for analysis. For the time being, we decided to do 
 preliminary analysis on data with and without stopwords for comparison. 
 
-## Data Sample Files Validation
+# Data Sample Files Validation
 To validate our sample files we used bootstrapping, a statistical resampling 
 method, to understand the distribution of unique words in our three types of 
 samples: blog posts, news articles, and Twitter messages. Bootstrapping lets us 
@@ -556,7 +554,7 @@ ggplot(bootstrap_results_long_allwords, aes(x = value, fill = variable)) +
 ```
 
 
-## Combining and Analyzing the Samples  
+# Combining and Analyzing the Sample Files
 
 ### Frequency Histograms
 Having validated our samples individually, we combined them into one file to 
@@ -621,9 +619,9 @@ ggplot(top_words_nostop, aes(x = reorder(feature, -frequency), y = frequency)) +
 
 ```
 
-### Multi-Word Analysis
+## Multi-Word Analysis
 
-#### Feature Co-Occcurrence Matrix
+### Feature Co-Occcurrence Matrix
 Next, we created a feature co-occurrence matrix (FCM), which is a fundamental 
 concept in text analysis. The FCM records how often different words (or 
 "features") appear together within a specified context window. In this case, 
@@ -647,7 +645,7 @@ fcm_matrix <- fcm(tokens)
 print(fcm_matrix)
 
 ```
-#### N-Gram Versus Collocation Analysis
+### N-Gram Versus Collocation Analysis
 N-gram analysis and collocation analysis are two ways we look at patterns in 
 text, but they do it a bit differently.
 
@@ -668,7 +666,7 @@ So, while N-gram analysis is like counting word clusters, collocation analysis
 goes a step further, looking at the meaning and context of words that often come 
 together. Next, we will look at both these analyses on our combined data sample.
 
-#### N-Gram Analysis  
+### N-Gram Analysis  
 N-gram analysis serves as a powerful method in the field of text analytics, 
 revealing patterns in data that single-word analysis might miss. It investigates 
 combinations of words, from pairs (bi-grams) to triplets (tri-grams) and 
@@ -722,7 +720,7 @@ ggplot(df_combined, aes(x = reorder(ngram, -freq), y = freq, fill = order)) +
 
 ```
 
-#### Collocation Analysis
+### Collocation Analysis
 Similiar to n-gram analysis, we focus on the frequency of word pairs, triplets, 
 and quartets in a text. For example, "in the" or "will be" are pairs of words, 
 "more and more" is a triplet, and "the way to the" is a quartet. The numbers in 
@@ -779,11 +777,6 @@ common language patterns that might be relevant.
 
 
 \newpage
-# References  
-
-<div id="refs"></div>  
-
-
 # Appendix: All Source Code  
 
 ```{r ref.label = knitr::all_labels(appendix == TRUE), echo=TRUE, eval=FALSE}
