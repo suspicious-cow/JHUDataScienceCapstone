@@ -51,13 +51,6 @@ bootstrap_results_df_allwords <- data.frame(
 # Melt the data frame to long format
 bootstrap_results_long_allwords <- reshape2::melt(bootstrap_results_df_allwords)
 
-# Plot
-library(ggplot2)
-ggplot(bootstrap_results_long_allwords, aes(x = value)) +
-  geom_histogram(bins = 30) +
-  facet_wrap(~ variable, scales = "free_x") +
-  theme_minimal() +
-  labs(title = "Bootstrap Sample Unique Word Counts (Raw)", y = "Frequency", x = "Number of Unique Words", fill = "Sample")
 
 # Compute the mean and standard deviation of the number of unique words for each source file
 summary_stats_allwords <- sapply(bootstrap_results_list_allwords, function(x) c(mean = mean(x), sd = sd(x)))
@@ -67,4 +60,22 @@ summary_stats_df_allwords <- data.frame(t(summary_stats_allwords))
 names(summary_stats_df_allwords) <- c("Mean", "Standard Deviation")
 rownames(summary_stats_df_allwords) <- c("Blogs", "News", "Twitter")
 
+cat("Summary Statistics with Stopwords", "\n")
 print(summary_stats_df_allwords)
+
+ggplot(bootstrap_results_long_allwords, aes(x = value, fill = variable)) + 
+  geom_histogram(bins = 30, color = "black", alpha = 0.7) +  
+  scale_fill_manual(values = c("#F8766D", "#00BA38", "#619CFF")) +  
+  facet_wrap(~ variable, scales = "free_x") +
+  theme_minimal() +
+  theme(
+    text = element_text(size = 14),  
+    legend.position = "bottom",  
+    plot.title = element_text(hjust = 0.5)  
+  ) +
+  labs(
+    title = "Bootstrap Sample Unique Word Counts with Stopwords", 
+    y = "Frequency", 
+    x = "Number of Unique Words", 
+    fill = "Text Source"  
+  )
