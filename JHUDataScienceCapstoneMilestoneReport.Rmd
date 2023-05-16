@@ -473,7 +473,9 @@ ggplot(bootstrap_results_long, aes(x = value, fill = variable)) +
 ```
 
 
-## Combining the Samples
+## Combining the Samples  
+
+### Frequency Histograms
 Having validated our samples individually, we combined them into one file to 
 facilitate fitting into our model. Our exploration begins with understanding our 
 data, focusing on the frequency of words. Two histograms are created to give us 
@@ -535,8 +537,30 @@ ggplot(top_words_nostop, aes(x = reorder(feature, -frequency), y = frequency)) +
 
 ```
 
+### Feature Co-Occcurrence Matrix
+Next, we created a feature co-occurrence matrix (FCM), which is a fundamental 
+concept in text analysis. The FCM records how often different words (or 
+"features") appear together within a specified context window. In this case, 
+each row and column represents a unique word in the data, and the number in each 
+cell indicates how many times the corresponding words co-occur.
 
+For example, take a look at the word "People" on the top left of the matrix. The 
+numbers in the same row tell you how many times "People" appears with each of 
+the other words. Similarly, if we go down the column for "People", we can see 
+how many times each word appears with "People".
 
+Unfortunately, FCM can be particularly large if the dataset contains many unique 
+words, which ours does. Our matrix size is 125,314 rows by 125,314 columns, but 
+only a portion of it is shown due to size constraints. An FCM is a powerful tool 
+for understanding relationships between words.
+```{r, echo = FALSE, warning = FALSE, error = FALSE, message = FALSE, appendix = TRUE, cache = TRUE}
+# Compute the feature co-occurrence matrix
+fcm_matrix <- fcm(tokens)
+
+# Print the feature co-occurrence matrix
+print(fcm_matrix)
+
+```
 
 \newpage
 # References  
