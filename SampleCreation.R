@@ -231,9 +231,12 @@ if (file.exists("Objects/corp.rds") &
   collocations3 <- textstat_collocations(tokens, size = 3)  # for tri-grams
   collocations4 <- textstat_collocations(tokens, size = 4)  # for quad-grams
   
-  # create tokens and dfm with stopwords removed
-  tokens_nostop <- tokens_remove(tokens, pattern = stopwords("english"))
+  # create tokens and dfm with stopwords and specific phrases removed
+  tokens_nostop <- tokens_remove(tokens, pattern = c(stopwords("english"), 
+                                                     "ã â ã â", 
+                                                     "â ã â ã"))
   tokens_dfm_nostop <- dfm(tokens_nostop)
+  
   
   # generate our frequency distributions for bi,tri, and quad-grams
   # without stopwords
