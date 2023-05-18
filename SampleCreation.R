@@ -11,7 +11,7 @@ set.seed(1337)
 required_libraries <- c("quanteda","quanteda.textmodels","quanteda.textstats",
                         "quanteda.textplots", "readtext", "text", "sqldf", 
                         "digest", "ggplot2", "dplyr", "gridExtra", "broom",
-                        "tidyverse")
+                        "tidyverse", "markovchain")
 
 for (lib in required_libraries) {
   if (!requireNamespace(lib, quietly = TRUE)) {
